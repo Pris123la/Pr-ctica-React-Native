@@ -1,0 +1,59 @@
+CREATE DATABASE app_todo;
+USE app_todo;
+
+CREATE TABLE users(
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    NAME VARCHAR(255),
+    EMAIL VARCHAR(255) UNIQUE NOT NULL,
+    PASSWORD VARCHAR(255)
+);
+
+SHOW TABLES;
+
+CREATE TABLE todos(
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    TITLE VARCHAR(255),
+    COMPLETED BOOLEAN DEFAULT false,
+    USER_ID INT NOT NULL,
+    FOREIGN KEY (USER_ID) REFERENCES users(ID) ON DELETE CASCADE 
+);
+
+CREATE TABLE shared_todos(
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    TODO_ID INT NOT NULL,
+    USER_ID INT NOT NULL,
+    SHARED_WITH_ID INT,
+    FOREIGN KEY (TODO_ID) REFERENCES todos(ID) ON DELETE CASCADE,
+    FOREIGN KEY (USER_ID) REFERENCES users(ID) ON DELETE CASCADE,
+    FOREIGN KEY (SHARED_WITH_ID) REFERENCES users(ID) ON DELETE CASCADE
+);
+
+--Inserciones
+INSERT INTO users (NAME, EMAIL, PASSWORD) VALUES ('Priscila', 'pris@example.com', 'password1');
+INSERT INTO users (NAME, EMAIL, PASSWORD) VALUES ('Gonzalo', 'gonza@example.com', 'password2');
+
+select * from todos;
+select * from users where ID = 1;
+
+INSERT INTO todos (TITLE, USER_ID) VALUES ('IR A CLASE', 1);
+INSERT INTO todos (TITLE, USER_ID) VALUES ('HACER TAREA', 1);
+INSERT INTO todos (TITLE, USER_ID) VALUES ('IR AL GYM', 1);
+INSERT INTO todos (TITLE, USER_ID) VALUES ('COCINAR', 1);
+
+SELECT * FROM todos WHERE USER_ID = 1;
+drop table shared_todos;
+SELECT * FROM shared_todos;
+
+INSERT INTO shared_todos (TODO_ID, USER_ID, SHARED_WITH_ID) VALUES (1, 1, 2);
+
+
+SELECT todos.*,shared_todos.SHARED_WITH_ID
+FROM todos
+LEFT JOIN shared_todos ON todos.ID = shared_todos.TODO_ID
+WHERE todos.USER_ID = 1 OR shared_todos.SHARED_WITH_ID = 1;
+
+SELECT todos.*,shared_todos.SHARED_WITH_ID
+FROM todos
+LEFT JOIN shared_todos ON todos.ID = shared_todos.TODO_ID
+WHERE todos.USER_ID = [USER_ID] OR shared_todos.SHARED_WITH_ID = [USER_ID];
+
